@@ -111,7 +111,7 @@ public class ImageReceiver : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
             rightEyeCamera = Instantiate(rightEyePrefab, transform.parent.parent);
             rightCamera = rightEyeCamera.GetComponent<Camera>();
-            needsCameraClear = true;
+            // needsCameraClear = true;
         }
 
 
@@ -133,12 +133,12 @@ public class ImageReceiver : MonoBehaviour
         originalCullingMask &= ~(1 << leftEyeLayer);
         originalCullingMask &= ~(1 << rightEyeLayer);
 
-        if (needsCameraClear)
-        {
-            rightEyeCamera.SetActive(false);
-            ClearTexture();
-            yield break;
-        }
+        // if (needsCameraClear)
+        // {
+        //     rightEyeCamera.SetActive(false);
+        //     ClearTexture();
+        //     yield break;
+        // }
 
         rightEyeCamera.SetActive(true);
 
