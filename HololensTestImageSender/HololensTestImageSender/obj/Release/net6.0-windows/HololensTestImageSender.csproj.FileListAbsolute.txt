@@ -1,0 +1,17 @@
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\bin\Release\net6.0-windows\HololensTestImageSender.exe
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\bin\Release\net6.0-windows\HololensTestImageSender.dll.config
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\bin\Release\net6.0-windows\HololensTestImageSender.deps.json
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\bin\Release\net6.0-windows\HololensTestImageSender.runtimeconfig.json
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\bin\Release\net6.0-windows\HololensTestImageSender.dll
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\bin\Release\net6.0-windows\HololensTestImageSender.pdb
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\obj\Release\net6.0-windows\HololensTestImageSender.MainForm.resources
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\obj\Release\net6.0-windows\HololensTestImageSender.csproj.GenerateResource.cache
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\obj\Release\net6.0-windows\HololensTestImageSender.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\obj\Release\net6.0-windows\HololensTestImageSender.AssemblyInfoInputs.cache
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\obj\Release\net6.0-windows\HololensTestImageSender.AssemblyInfo.cs
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\obj\Release\net6.0-windows\HololensTestImageSender.csproj.CoreCompileInputs.cache
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\obj\Release\net6.0-windows\HololensTestImageSender.dll
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\obj\Release\net6.0-windows\refint\HololensTestImageSender.dll
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\obj\Release\net6.0-windows\HololensTestImageSender.pdb
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\obj\Release\net6.0-windows\HololensTestImageSender.genruntimeconfig.cache
+C:\Users\clint\PiseoHL2ImageTest\HololensTestImageSender\HololensTestImageSender\obj\Release\net6.0-windows\ref\HololensTestImageSender.dll

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "71sA/QXwm/TSkqEpdv0WCl1XQKcpPD0RZ5F2Ky9VYucYrcJCvEh0aXgGzP8krRJJBCy0wQ6p4EmMyq7yMYvNjQ==",
+  "dgSpecHash": "B0UQfPGcdzwsNZrDSc9LFCf71aIyCao+dLr7dhqRV9WxHfC2qID5RC5sQzNIJOItzrQy+/pRs/wcseUJohM0fA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\clint\\source\\repos\\HololensTestImageSender\\HololensTestImageSender\\HololensTestImageSender.csproj",
+  "projectFilePath": "C:\\Users\\clint\\PiseoHL2ImageTest\\HololensTestImageSender\\HololensTestImageSender\\HololensTestImageSender.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
