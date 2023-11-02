@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "dgSpecHash": "p+g+UU2aYtmpzrX30e1Dib6DYDXdLVSBxabmhtQ+rE4ofBrMGtmjEbactY5Qn5xn76A7YbLvbkk7qyV2OGPTIA==",
+  "success": false,
+  "projectFilePath": "X:\\unity\\Projects\\InflexionPoint-Bylder\\Bylder\\Assets\\MixedRealityToolkit.Providers\\WindowsMixedReality\\DotNetAdapter\\DotNetAdapter.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\redth\\.nuget\\packages\\microsoft.windows.mixedreality.dotnetwinrt\\0.5.1049\\microsoft.windows.mixedreality.dotnetwinrt.0.5.1049.nupkg.sha512",
+    "C:\\Users\\redth\\.nuget\\packages\\system.drawing.primitives\\4.3.0\\system.drawing.primitives.4.3.0.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1101",
+      "level": "Error",
+      "message": "Unable to find package MSBuildForUnity. No packages exist with this id in source(s): Microsoft Visual Studio Offline Packages, NuGet, nuget.org",
+      "libraryId": "MSBuildForUnity",
+      "targetGraphs": [
+        ".NETFramework,Version=v4.6"
+      ]
+    }
+  ]
+}

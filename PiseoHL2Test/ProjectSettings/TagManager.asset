@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Selectable
+  - picker
+  - button
+  - fingertip
+  - LayoutCollection
+  - Layout
+  - Measurement
+  - Map
+  - Model
+  - Mic
+  - THIS Y CORNER
+  - PlacedModels
+  - PlacedMaps
+  - Bullet
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - PostProcessing
+  - Preview
+  - Placement
+  - Circumference
+  - Label
+  - LeftEye
+  - RightEye
+  - 
+  - 
+  - PipePoint
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - Plane_Mask
+  - 
+  - Environment
+  - Spatial Awareness
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Label
+    uniqueID: 3404669977
+    locked: 0

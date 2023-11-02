@@ -1,0 +1,76 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.6": {}
+  },
+  "libraries": {},
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.6": [
+      "MSBuildForUnity >= 0.9.1-* <= 0.9.1"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\clint\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "D:\\Projects\\Byldr\\Bylder\\Assets\\Byldr.Dependencies.msb4u.csproj",
+      "projectName": "Byldr.Dependencies.msb4u",
+      "projectPath": "D:\\Projects\\Byldr\\Bylder\\Assets\\Byldr.Dependencies.msb4u.csproj",
+      "packagesPath": "C:\\Users\\clint\\.nuget\\packages\\",
+      "outputPath": "D:\\Projects\\Byldr\\Bylder\\MSBuild\\Output\\obj\\Dependencies\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+      ],
+      "configFilePaths": [
+        "D:\\Projects\\Byldr\\Bylder\\Assets\\NuGet.Config",
+        "C:\\Users\\clint\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net46"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "http://www.nuget.org/api/v2/": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net46": {
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net46": {
+        "dependencies": {
+          "MSBuildForUnity": {
+            "include": "Runtime, Build, Native, ContentFiles, Analyzers",
+            "suppressParent": "Analyzers",
+            "target": "Package",
+            "version": "[0.9.1-*, 0.9.1]"
+          }
+        }
+      }
+    }
+  },
+  "logs": [
+    {
+      "code": "NU1101",
+      "level": "Error",
+      "message": "Unable to find package MSBuildForUnity. No packages exist with this id in source(s): Microsoft Visual Studio Offline Packages, NuGet, nuget.org",
+      "libraryId": "MSBuildForUnity",
+      "targetGraphs": [
+        ".NETFramework,Version=v4.6"
+      ]
+    }
+  ]
+}
