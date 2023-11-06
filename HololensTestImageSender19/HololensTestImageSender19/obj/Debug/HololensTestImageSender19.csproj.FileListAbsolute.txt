@@ -1,0 +1,9 @@
+C:\Users\clint\source\repos\HololensTestImageSender19\HololensTestImageSender19\bin\Debug\HololensTestImageSender19.exe.config
+C:\Users\clint\source\repos\HololensTestImageSender19\HololensTestImageSender19\bin\Debug\HololensTestImageSender19.exe
+C:\Users\clint\source\repos\HololensTestImageSender19\HololensTestImageSender19\bin\Debug\HololensTestImageSender19.pdb
+C:\Users\clint\source\repos\HololensTestImageSender19\HololensTestImageSender19\obj\Debug\HololensTestImageSender19.csproj.AssemblyReference.cache
+C:\Users\clint\source\repos\HololensTestImageSender19\HololensTestImageSender19\obj\Debug\HololensTestImageSender19.Properties.Resources.resources
+C:\Users\clint\source\repos\HololensTestImageSender19\HololensTestImageSender19\obj\Debug\HololensTestImageSender19.csproj.GenerateResource.cache
+C:\Users\clint\source\repos\HololensTestImageSender19\HololensTestImageSender19\obj\Debug\HololensTestImageSender19.csproj.CoreCompileInputs.cache
+C:\Users\clint\source\repos\HololensTestImageSender19\HololensTestImageSender19\obj\Debug\HololensTestImageSender19.exe
+C:\Users\clint\source\repos\HololensTestImageSender19\HololensTestImageSender19\obj\Debug\HololensTestImageSender19.pdb
