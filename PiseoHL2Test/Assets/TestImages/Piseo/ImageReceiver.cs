@@ -1,29 +1,39 @@
-﻿using System;
+﻿// using System;
+
+using System;
 using UnityEngine;
 using System.Collections;
 using System.IO;
-using System.Text;
+// using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Quaternion = System.Numerics.Quaternion;
+using Microsoft.Graph;
+using File = System.IO.File;
+
 #if WINDOWS_UWP && !UNITY_EDITOR
-using Windows.Networking.Sockets;
-using Windows.Storage.Streams;
+// using Windows.Networking.Sockets;
+// using Windows.Storage.Streams;
 // using Windows.Storage;
+using System.Threading.Tasks;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using System.Linq;
+
 #else
-using System.Net;
+// using System.Net;
 #endif
 
 
 public class ImageReceiver : MonoBehaviour
 {
     private bool isRunning = false;
+
     private int originalCullingMask;
-#if WINDOWS_UWP && !UNITY_EDITOR
-     private StreamSocketListener listener;
-#else
-    private HttpListener listener;
-#endif
+
+// #if WINDOWS_UWP && !UNITY_EDITOR
+//      private StreamSocketListener listener;
+// #else
+//     private HttpListener listener;
+// #endif
     public Material targetMaterial;
 
     public GameObject rightEyePrefab;
@@ -31,59 +41,41 @@ public class ImageReceiver : MonoBehaviour
     public GameObject rightEyeCamera;
 
     private Camera rightCamera;
-
+    private string prevImage = "none";
+    private string cameraTransformFilePath = "CameraTransform.txt"; // File path for camera transform
     // public GameObject byldGameObject = null;
     // [SerializeField] private GameObject otherObjects;
     private CancellationTokenSource cts;
 
     private void Start()
     {
-        StartCoroutine(SetCamera());
-        StartCoroutine(CheckForFolderImage());
-
-#if WINDOWS_UWP && !UNITY_EDITOR
-         // cts = new CancellationTokenSource();
-         // listener = new StreamSocketListener();
-         // listener.ConnectionReceived += ListenerConnectionReceived;
-         // StartCoroutine(BindServiceNameAsync("8000"));
-         // isRunning = true;
-#else
-        listener = new HttpListener();
-        listener.Prefixes.Add("http://*:8000/"); // Listen on port 8000. "*" means any available IP.
-        listener.Start();
         isRunning = true;
-        Thread listenerThread = new Thread(new ThreadStart(ListenerCallback));
-        listenerThread.Start();
-#endif
+        StartCoroutine(SetCamera(readFromFile: true));
+        StartCoroutine(CheckForFolderImage());
     }
-#if WINDOWS_UWP && !UNITY_EDITOR
-// private IEnumerator BindServiceNameAsync(string port)
-// {
-//     var bindOperation = listener.BindServiceNameAsync(port).AsTask(cts.Token);
-//
-//     // Wait until the bind operation is complete
-//     while (!bindOperation.IsCompleted)
-//     {
-//         yield return null; // Wait until next frame
-//     }
-//
-//     try
-//     {
-//         // This will rethrow any exceptions that were caught during the bind operation
-//         bindOperation.GetAwaiter().GetResult();
-//         isRunning = true; // Only set to true if binding is successful
-//     }
-//     catch (Exception ex)
-//     {
-//         // Handle exceptions (e.g., unable to bind to the port)
-//         Debug.LogError($"Exception when trying to bind listener: {ex}");
-//         // Consider how to handle this error. Do you want to retry, alert the user, etc.?
-//     }
-// }
-#endif
 
-    private IEnumerator SetCamera()
+    private IEnumerator SetCamera(bool readFromFile = false)
     {
+        
+        // if (readFromFile && File.Exists(cameraTransformFilePath))
+        // {
+        //     // Read and set camera transform from file
+        //     string[] lines = File.ReadAllLines(cameraTransformFilePath);
+        //     if (lines.Length >= 2)
+        //     {
+        //         transform.localPosition = StringToVector3(lines[0]);
+        //         transform.localRotation = Quaternion.Euler(StringToVector3(lines[1]));
+        //     }
+        // }
+        // else
+        // {
+        //     // Save current camera transform to file
+        //     File.WriteAllLines(cameraTransformFilePath, new string[] { 
+        //         Vector3ToString(transform.localPosition), 
+        //         Vector3ToString(transform.localRotation.eulerAngles) 
+        //     });
+        // }
+        
         bool needsCameraClear = false;
         yield return new WaitForSeconds(0.1f);
         while (Camera.main != null && transform.parent != Camera.main.transform)
@@ -93,15 +85,15 @@ public class ImageReceiver : MonoBehaviour
                 continue;
             needsCameraClear = true;
             transform.parent = Camera.main.transform;
-            
+
             transform.localRotation = UnityEngine.Quaternion.Euler(-0.3f, 0.69f, -0.12f);
             transform.localPosition = new Vector3(3.29f, 1.64f, 184.8f);
             transform.localScale = new Vector3(0.1017f, 0.1f, 0.1f);
         }
 
         transform.parent = Camera.main.transform;
-        
-        
+
+
         transform.localRotation = UnityEngine.Quaternion.Euler(-0.3f, 0.69f, -0.12f);
         transform.localPosition = new Vector3(3.29f, 1.64f, 184.8f);
         transform.localScale = new Vector3(0.1017f, 0.1f, 0.1f);
@@ -150,455 +142,159 @@ public class ImageReceiver : MonoBehaviour
         mainCamera.stereoSeparation = 0;
         mainCamera.farClipPlane = 10000000000000;
     }
+// Utility method to convert a Vector3 to a string
+    private string Vector3ToString(Vector3 vector)
+    {
+        return $"{vector.x},{vector.y},{vector.z}";
+    }
 
-   private IEnumerator CheckForFolderImage()
+    // Utility method to convert a string to a Vector3
+    private Vector3 StringToVector3(string sVector)
+    {
+        string[] sArray = sVector.Split(',');
+        return new Vector3(
+            float.Parse(sArray[0]),
+            float.Parse(sArray[1]),
+            float.Parse(sArray[2]));
+    }
+
+private IEnumerator CheckForFolderImage()
 {
-#if UNITY_UWP && !UNITY_EDITOR
+    isRunning = true;
+    DebugLog.Log("CheckForFolderImage coroutine started.");
     while (isRunning)
-    { 
-        StorageFolder picturesFolder = KnownFolders.PicturesLibrary;
-        StorageFolder testImagesFolder = null;
+    {
+        #if WINDOWS_UWP && !UNITY_EDITOR
+        DebugLog.Log("UWP Platform detected.");
+        // UWP-specific code to access the Pictures library
+        var picturesFolder = Windows.Storage.KnownFolders.PicturesLibrary;
+        var piseoFolderOperation = picturesFolder.CreateFolderAsync("Piseo", Windows.Storage.CreationCollisionOption.OpenIfExists);
+        DebugLog.Log("Attempting to open or create Piseo folder in Pictures.");
 
-        // Check if the TestImages folder exists or create it if it doesn't
-        yield return CheckOrCreateTestImagesFolder(picturesFolder, (folder) => testImagesFolder = folder);
-
-        // Get the files in the TestImages folder
-        if (testImagesFolder != null)
+        // Wait for the folder creation operation to complete
+        DateTime startTime = DateTime.Now;
+        while (piseoFolderOperation.Status != AsyncStatus.Completed && DateTime.Now - startTime < TimeSpan.FromSeconds(3f))
         {
-            IReadOnlyList<StorageFile> files = null;
-            yield return GetFilesInFolder(testImagesFolder, (f) => files = f);
-
-            if (files != null && files.Count > 0)
-            {
-                StorageFile selectedImageFile = files[0];
-                yield return ProcessSelectedImageFile(selectedImageFile, testImagesFolder);
-            }
-            else
-            {
-                ClearTexture();
-            }
+            yield return null;
         }
+        if(DateTime.Now - startTime >= TimeSpan.FromSeconds(3f))
+            DebugLog.LogError("PiseoFolderOperation timed out.");
+        DebugLog.Log("Piseo folder access status: " + piseoFolderOperation.Status);
 
-        yield return new WaitForSeconds(1f);
-    }
-#endif
-    yield break;
-}
-#if UNITY_UWP && !UNITY_EDITOR
-private IEnumerator CheckOrCreateTestImagesFolder(StorageFolder picturesFolder, Action<StorageFolder> callback)
-{
-
-    StorageFolder testImagesFolder = null;
-    try
-    {
-        testImagesFolder = await picturesFolder.GetFolderAsync("TestImages");
-    }
-    catch (Exception)
-    {
-        testImagesFolder = await picturesFolder.CreateFolderAsync("TestImages", CreationCollisionOption.OpenIfExists);
-    }
-    callback?.Invoke(testImagesFolder);
-
-    yield break;
-}
-#endif
-    
-#if UNITY_UWP && !UNITY_EDITOR
-private IEnumerator GetFilesInFolder(StorageFolder folder, Action<IReadOnlyList<StorageFile>> callback)
-{
-
-    IReadOnlyList<StorageFile> files = null;
-    try
-    {
-        files = await folder.GetFilesAsync();
-    }
-    catch (Exception e)
-    {
-        Debug.LogError("Error accessing folder: " + e.Message);
-    }
-    callback?.Invoke(files);
-
-    yield break;
-}
-#endif
-#if UNITY_UWP && !UNITY_EDITOR
-private IEnumerator ProcessSelectedImageFile(StorageFile selectedImageFile, StorageFolder testImagesFolder)
-{
-
-    byte[] imageData = null;
-    try
-    {
-        imageData = await FileIO.ReadBufferAsync(selectedImageFile).AsTask();
-        if (imageData != null)
+        if (piseoFolderOperation.Status == AsyncStatus.Completed)
         {
-            Texture2D newTexture = new Texture2D(2, 2); // Create a small Texture2D with a dummy size, LoadImage will resize it properly.
-            if (newTexture.LoadImage(imageData))
+            var piseoFolder = piseoFolderOperation.GetResults();
+            var filesOperation = piseoFolder.GetFilesAsync();
+
+            // Wait for the file retrieval operation to complete
+            startTime = DateTime.Now;
+            while (filesOperation.Status != AsyncStatus.Completed && DateTime.Now - startTime < TimeSpan.FromSeconds(3f))
             {
-                // Use UnityMainThreadDispatcher to execute Unity API calls on the main thread.
-                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                yield return null;
+            }
+            if(DateTime.Now - startTime >= TimeSpan.FromSeconds(3f))
+                DebugLog.LogError("filesOperation timed out.");
+            if (filesOperation.Status == AsyncStatus.Completed)
+            {
+                var files = filesOperation.GetResults();
+                // Convert IReadOnlyList to List for LINQ support
+                var fileList = files.ToList();
+                var imageFiles = fileList.Where(file => file.FileType == ".png").ToList();
+
+                DebugLog.Log($"Found {imageFiles.Count} PNG files in Piseo folder.");
+
+                if (imageFiles.Count > 0)
                 {
-                    ApplyTexture(newTexture, selectedImageFile.Name);
-                });
-
-                // Delete other images.
-                // yield return DeleteOtherFiles(testImagesFolder, selectedImageFile.Name);
-            }
-            else
-            {
-                Debug.LogError("Failed to load image data into texture.");
+                    var selectedImageFile = imageFiles[0]; // Assuming you want to process the first image
+                    if (selectedImageFile.Name != prevImage)
+                    {
+                        prevImage = selectedImageFile.Name;
+                        DebugLog.Log("Selected image file: " + selectedImageFile.Name);
+                        yield return ProcessSelectedImageFile(selectedImageFile);
+                    }
+                }
             }
         }
+        else
+        {
+            DebugLog.LogError("Failed to open or create Piseo folder in Pictures.");
+        }
+        // #else
+        // ... [fallback code for other platforms]
+        #endif
+        yield return new WaitForSeconds(1f); // Check for new images every second
     }
-    catch (Exception e)
-    {
-        Debug.LogError("Error reading file: " + e.Message);
-    }
-
-    yield break;
 }
-#endif
-#if UNITY_UWP && !UNITY_EDITOR
-// private IEnumerator DeleteOtherFiles(StorageFolder folder, string keepFileName)
-// {
-//
-//     IReadOnlyList<StorageFile> files = null;
-//     try
-//     {
-//         files = await folder.GetFilesAsync();
-//         foreach (var file in files)
-//         {
-//             if (file.Name != keepFileName)
-//             {
-//                 await file.DeleteAsync();
-//             }
-//         }
-//     }
-//     catch (Exception e)
-//     {
-//         Debug.LogError("Error deleting files: " + e.Message);
-//     }
-//
-//     yield break;
-// }
-#endif
-private void ApplyTexture(Texture2D texture, string textureName)
-{
-    // Ensure the Unity API calls are here since this is called on the main thread.
-    texture.name = textureName;
-    targetMaterial.SetTexture("_MainTex", texture);
-}
-
-    
 #if WINDOWS_UWP && !UNITY_EDITOR
-//     private async void ListenerConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
-//     {
-//         try
-//         {
-//             // Read the HTTP request.
-//             using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
-//             {
-//                 string request = await streamReader.ReadLineAsync();
-// if (request.Contains("/clearTexture")) // Check for the clearTexture endpoint
-//             {
-//                 ClearTexture(); // Clear the texture
-//
-//                 // Send 200 OK response to acknowledge the action
-//                 using (Windows.Storage.Streams.DataWriter writer =
-//  new Windows.Storage.Streams.DataWriter(args.Socket.OutputStream))
-//                 {
-//                     writer.WriteString("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
-//                     await writer.StoreAsync();
-//                 }
-//             }
-//                else if (request.StartsWith("POST"))
-//                 {
-//                     await Process(args.Socket);
-//                 }
-//                 else
-//                 {
-//                     // Handle non-POST requests here (e.g., send 400 Bad Request response)
-//                 }
-//             }
-//         }
-//         catch (Exception e)
-//         {
-//             Debug.LogError("Error in ListenerConnectionReceived: " + e.Message);
-//         }
-//     }
-//
-//     private async Task Process(StreamSocket socket)
-//     {
-//     try
-//     {
-//         using (DataReader reader = new DataReader(socket.InputStream))
-//         {
-//             reader.InputStreamOptions = InputStreamOptions.Partial; // Allow partial reads
-//
-//             // Parse headers to find content length and content type. (This needs more logic to be robust.)
-//             uint contentLength = 0; // TODO: Parse this from the headers
-//             string contentType = ""; // TODO: Parse this too
-//
-//             // Prepare a buffer for the data
-//             byte[] buffer = new byte[contentLength];
-//
-//             await reader.LoadAsync(contentLength);
-//             reader.ReadBytes(buffer);
-//
-//             // Immediately save the raw buffer to see if it's received correctly
-//             // System.IO.File.WriteAllBytes("Assets/RawReceivedImage.png", buffer);
-//
-//             string boundary = "--" + contentType.Split('=')[1];
-//             string[] parts =
-//  System.Text.Encoding.UTF8.GetString(buffer).Split(new string[] { boundary }, StringSplitOptions.RemoveEmptyEntries);
-//             byte[] imageData = null;
-//
-//             foreach (var part in parts)
-//             {
-//                 if (part.Contains("filename"))
-//                 {
-//                     byte[] doubleNewline = Encoding.UTF8.GetBytes("\r\n\r\n");
-//
-//                     int startOfImageDataInBuffer = IndexOf(buffer, doubleNewline);
-//                     if (startOfImageDataInBuffer != -1)
-//                     {
-//                         startOfImageDataInBuffer += 4; // Skip over the double newline
-//
-//                         int lengthOfImageData = buffer.Length - startOfImageDataInBuffer;
-//                         imageData = new byte[lengthOfImageData];
-//                         Array.Copy(buffer, startOfImageDataInBuffer, imageData, 0, lengthOfImageData);
-//                     }
-//                 }
-//             }
-//
-//             Debug.LogError($"for loop finished, {imageData==null}");
-//             if (imageData != null)
-//             {
-//                 // Unity actions have to be run in the main thread
-//                 UnityMainThreadDispatcher.Instance().Enqueue(() =>
-//                 {
-//                     Debug.Log($"Received image data of size: {imageData.Length} bytes");
-//                     //System.IO.File.WriteAllBytes("Assets/DebugReceivedImage.png", imageData);
-//                     StartCoroutine(SetCamera());
-//                     #if !UNITY_EDITOR
-//                     Texture2D receivedTexture = new Texture2D(1440, 963);
-//                     bool isLoaded = receivedTexture.LoadImage(imageData);
-//                     Sprite sprite =
-//  Sprite.Create(receivedTexture, new Rect(0.0f, 0.0f, receivedTexture.width, receivedTexture.height), new Vector2(0.5f, 0.5f), 100.0f);
-//                     Debug.Log("Texture loaded: " + isLoaded);
-//                     if (isLoaded)
-//                     {
-//                         targetMaterial.SetTexture("_MainTex", sprite.texture);
-//                     }
-//                     else
-//                     {
-//                         Debug.LogError("Failed to load image onto texture.");
-//                     }
-//                     #endif
-//
-//                 });
-//
-//                 // Send 200 OK response
-//                 using (Windows.Storage.Streams.DataWriter writer =
-//  new Windows.Storage.Streams.DataWriter(socket.OutputStream))
-//                 {
-//                     writer.WriteString("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
-//                     await writer.StoreAsync();
-//                 }
-//             }
-//             else
-//             {
-//                 Debug.LogError("Failed to extract image data.");
-//                 // Send 400 Bad Request response
-//                 using (Windows.Storage.Streams.DataWriter writer =
-//  new Windows.Storage.Streams.DataWriter(socket.OutputStream))
-//                 {
-//                     writer.WriteString("HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n");
-//                     await writer.StoreAsync();
-//                 }
-//             }
-//         }
-//     }
-//     catch (Exception e)
-//     {
-//         Debug.LogError("Error processing request: " + e.Message);
-//         // Send 500 Internal Server Error response
-//         using (Windows.Storage.Streams.DataWriter writer = new Windows.Storage.Streams.DataWriter(socket.OutputStream))
-//         {
-//             writer.WriteString("HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n");
-//             await writer.StoreAsync();
-//         }
-//     }
-// }
-#else
-    private void ListenerCallback()
+private IEnumerator ProcessSelectedImageFile(Windows.Storage.StorageFile imageFile)
+{
+    DebugLog.Log("Processing image file: " + imageFile.Path);
+
+    var bufferOperation = Windows.Storage.FileIO.ReadBufferAsync(imageFile);
+
+    // Wait for the read buffer operation to complete
+    DateTime startTime = DateTime.Now;
+    while (bufferOperation.Status != AsyncStatus.Completed && DateTime.Now - startTime < TimeSpan.FromSeconds(3f))
     {
-        while (isRunning)
-        {
-            try
-            {
-                var context = listener.GetContext(); // Block until a connection comes in.
-                if (context != null)
-                    Process(context);
-            }
-            catch (HttpListenerException e)
-            {
-                // This exception is thrown when listener is stopped while waiting in GetContext.
-                // We can safely ignore it if we're shutting down; otherwise, you might want to handle or log it.
-                if (isRunning)
-                {
-                    Debug.LogError("HttpListenerException: " + e.Message + e.StackTrace);
-                }
-            }
-            catch (Exception e)
-            {
-                UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                {
-                    Debug.LogError("Exception in ListenerCallback: " + e.Message + e.StackTrace);
-                });
-            }
-        }
+        yield return null;
     }
-
-    private void Process(HttpListenerContext context)
+    if(DateTime.Now - startTime >= TimeSpan.FromSeconds(3f))
+        DebugLog.LogError("bufferOperation timed out.");
+    
+    if (bufferOperation.Status == AsyncStatus.Completed)
     {
-        var request = context.Request;
-        var response = context.Response;
-        Debug.Log($"We received a request!");
-
-        try
-        {
-            if (request.Url.AbsolutePath.Equals("/clearTexture", StringComparison.OrdinalIgnoreCase))
+        var buffer = bufferOperation.GetResults();
+        byte[] imageData = buffer.ToArray();  // Using WindowsRuntimeBufferExtensions
+        
+        // Texture2D newTexture = new Texture2D(2, 2); // Create a small Texture2D with a dummy size, LoadImage will resize it properly.
+        // if (newTexture.LoadImage(imageData))
+        // {
+            DebugLog.LogError("Load image data into texture. Success");
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
-                ClearTexture();
-
-                response.StatusCode = 200;
-                response.StatusDescription = "OK";
-                response.Close();
-                return; // Important: Return here to avoid processing the request further.
-            }
-
-
-            if (request.HttpMethod == "POST" && request.ContentLength64 > 0)
-            {
-                byte[] buffer;
-
-                // Reading the entire stream into buffer
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    byte[] tempBuffer = new byte[4096];
-                    int bytesRead;
-                    while ((bytesRead = request.InputStream.Read(tempBuffer, 0, tempBuffer.Length)) > 0)
-                    {
-                        ms.Write(tempBuffer, 0, bytesRead);
-                    }
-
-                    buffer = ms.ToArray(); // Now 'buffer' contains the full request payload.
-                }
-
-                // Immediately save the raw buffer to see if it's received correctly
-
-                // System.IO.File.WriteAllBytes("Assets/RawReceivedImage.png", buffer);
-
-                string boundary = "--" + request.ContentType.Split('=')[1];
-                string[] parts = System.Text.Encoding.UTF8.GetString(buffer)
-                    .Split(new string[] { boundary }, StringSplitOptions.RemoveEmptyEntries);
-                byte[] imageData = null;
-
-                foreach (var part in parts)
-                {
-                    if (part.Contains("filename"))
-                    {
-                        byte[] doubleNewline = Encoding.UTF8.GetBytes("\r\n\r\n");
-
-                        int startOfImageDataInBuffer = IndexOf(buffer, doubleNewline);
-                        if (startOfImageDataInBuffer != -1)
-                        {
-                            startOfImageDataInBuffer += 4; // Skip over the double newline
-
-                            int lengthOfImageData = buffer.Length - startOfImageDataInBuffer;
-                            imageData = new byte[lengthOfImageData];
-                            Array.Copy(buffer, startOfImageDataInBuffer, imageData, 0, lengthOfImageData);
-                        }
-                    }
-                }
-
-                Debug.LogError($"for loop finished, {imageData == null}");
-                if (imageData != null)
-                {
-                    // Unity actions have to be run in the main thread
-                    UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                    {
-                        Debug.Log($"Received image data of size: {imageData.Length} bytes");
+                DebugLog.Log($"Received image data of size: {imageData.Length} bytes");
                         // System.IO.File.WriteAllBytes("Assets/DebugReceivedImage.png", imageData);
                         StartCoroutine(SetCamera());
                         Texture2D receivedTexture = new Texture2D(1440, 963);
                         bool isLoaded = receivedTexture.LoadImage(imageData);
                         Sprite sprite = Sprite.Create(receivedTexture,
-                            new Rect(0.0f, 0.0f, receivedTexture.width, receivedTexture.height),
+                            new UnityEngine.Rect(0.0f, 0.0f, receivedTexture.width, receivedTexture.height),
                             new Vector2(0.5f, 0.5f), 100.0f);
-                        Debug.Log("Texture loaded: " + isLoaded);
+                        DebugLog.Log("Texture loaded: " + isLoaded);
                         if (isLoaded)
                         {
                             targetMaterial.SetTexture("_MainTex", sprite.texture);
                         }
                         else
                         {
-                            Debug.LogError("Failed to load image onto texture.");
+                            DebugLog.LogError("Failed to load image onto texture.");
                         }
-                    });
 
-                    response.StatusCode = 200;
-                    response.StatusDescription = "OK";
-                }
-                else
-                {
-                    Debug.LogError("Failed to extract image data.");
-                    response.StatusCode = 400;
-                    response.StatusDescription = "Bad Request";
-                }
-            }
-            else
-            {
-                response.StatusCode = 400;
-                response.StatusDescription = "Bad Request";
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("Error processing request: " + e.Message);
 
-            response.StatusCode = 500;
-            response.StatusDescription = "Internal Server Error";
-        }
-        finally
-        {
-            // Close the input stream and response to free up resources.
-            request.InputStream.Close();
-            response.Close();
-        }
+                // ApplyTexture(newTexture, imageFile.Name);
+                // DebugLog.LogError("Apply image data into texture. Success");
+            });
+        // }
+        
+        
+    }
+    else
+    {
+        DebugLog.LogError("Failed to read image file.");
     }
 
+    yield break;
+}
 #endif
 
-    private static int IndexOf(byte[] haystack, byte[] needle)
+
+    private void ApplyTexture(Texture2D texture, string textureName)
     {
-        for (int i = 0; i <= haystack.Length - needle.Length; i++)
-        {
-            bool found = true;
-            for (int j = 0; j < needle.Length; j++)
-            {
-                if (haystack[i + j] != needle[j])
-                {
-                    found = false;
-                    break;
-                }
-            }
-
-            if (found) return i;
-        }
-
-        return -1;
+        // Ensure the Unity API calls are here since this is called on the main thread.
+        texture.name = textureName;
+        targetMaterial.SetTexture("_MainTex", texture);
     }
+
 
 // Method to clear the texture
     private void ClearTexture()
@@ -628,12 +324,7 @@ private void ApplyTexture(Texture2D texture, string textureName)
     private void OnApplicationQuit()
     {
         isRunning = false;
-#if WINDOWS_UWP && !UNITY_EDITOR
-    listener?.Dispose();
-    cts?.Cancel();
-#else
-        listener?.Stop();
-#endif
+
         // If you have started any threads, make sure to join them here.
     }
 }

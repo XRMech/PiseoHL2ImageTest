@@ -787,29 +787,29 @@ PlayerSettings:
       HumanInterfaceDevice: False
       InputInjectionBrokered: False
       InternetClient: True
-      InternetClientServer: True
+      InternetClientServer: False
       Location: False
       LowLevelDevices: False
       Microphone: True
-      MusicLibrary: True
+      MusicLibrary: False
       Objects3D: True
       OfflineMapsManagement: False
       PhoneCall: False
       PhoneCallHistoryPublic: False
       PicturesLibrary: True
       PointOfService: False
-      PrivateNetworkClientServer: True
+      PrivateNetworkClientServer: False
       Proximity: False
       RecordedCallsFolder: False
-      RemoteSystem: True
-      RemovableStorage: True
-      SharedUserCertificates: True
-      SpatialPerception: False
+      RemoteSystem: False
+      RemovableStorage: False
+      SharedUserCertificates: False
+      SpatialPerception: True
       SystemManagement: False
       UserAccountInformation: False
       UserDataTasks: False
       UserNotificationListener: False
-      VideosLibrary: True
+      VideosLibrary: False
       VoipCall: False
       WebCam: False
   metroTargetDeviceFamilies:
